@@ -91,11 +91,11 @@ pipeline {
                 )]) {
                     sh """
                         echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
-                        docker push ${DOCKER_IMAGE}:${BUILD_VERSION}
+                        sudo docker push ${DOCKER_IMAGE}:${BUILD_VERSION}
 
                         # Tag and push latest
-                        docker tag ${DOCKER_IMAGE}:${BUILD_VERSION} ${DOCKER_IMAGE}:latest
-                        docker push ${DOCKER_IMAGE}:latest
+                        sudo docker tag ${DOCKER_IMAGE}:${BUILD_VERSION} ${DOCKER_IMAGE}:latest
+                        sudo docker push ${DOCKER_IMAGE}:latest
                     """
                 }
             }

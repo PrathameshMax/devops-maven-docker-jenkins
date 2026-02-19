@@ -74,11 +74,8 @@ pipeline {
             }
             steps {
                 sh """
-                    docker build \
-                      --build-arg BUILD_VERSION=${BUILD_VERSION} \
-                      -f test-dockerfile
-                      -t ${DOCKER_IMAGE}:${BUILD_VERSION} .
-                """
+                    docker build -f test-dockerfile --build-arg BUILD_VERSION=${BUILD_VERSION} -t ${DOCKER_IMAGE}:${BUILD_VERSION} .
+                 """
             }
         }
 

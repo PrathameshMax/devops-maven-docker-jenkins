@@ -76,6 +76,7 @@ pipeline {
                 sh """
                     docker build \
                       --build-arg BUILD_VERSION=${BUILD_VERSION} \
+                      -f test-dockerfile
                       -t ${DOCKER_IMAGE}:${BUILD_VERSION} .
                 """
             }

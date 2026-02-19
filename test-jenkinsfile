@@ -74,7 +74,7 @@ pipeline {
             }
             steps {
                 sh """
-                    docker build -f test-dockerfile --build-arg BUILD_VERSION=${BUILD_VERSION} -t ${DOCKER_IMAGE}:${BUILD_VERSION} .
+                    sudo docker build -f test-dockerfile --build-arg BUILD_VERSION=${BUILD_VERSION} -t ${DOCKER_IMAGE}:${BUILD_VERSION} .
                  """
             }
         }

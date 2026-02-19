@@ -99,6 +99,27 @@ pipeline {
                 }
             }
         }
+
+        stage('Run Container') {
+        when {
+            expression { return params.RUN_BUILD }
+        }
+        steps {
+        sh '''
+            # Stop container if running
+            docker stop devops-container || true
+
+            # Remove container if exists
+            docker rm devops-container || true
+
+            # Run new container
+            docker run -d \
+              --name devops-container \
+              -p 9090:8080 \
+              ramann123/bosch-test-repo:latest
+        '''
+        }
+     }
     }
 
     post {

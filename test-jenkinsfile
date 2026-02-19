@@ -27,7 +27,7 @@ pipeline {
 
     environment {
         BUILD_VERSION = "${params.CUSTOM_VERSION ?: "1.0.${env.BUILD_NUMBER}"}"
-        ARTIFACTORY_URL = "http://20.109.57.182:8082/artifactory/raman-dev-local"
+        DOCKER_IMAGE = "ramann123/bosch-test-repo"   // <-- Change to your DockerHub username
     }
 
     stages {
@@ -67,30 +67,46 @@ pipeline {
                 """
             }
         }
-/*
-        stage('Upload to Artifactory') {
+
+        stage('Build Docker Image') {
             when {
                 expression { return params.RUN_BUILD }
             }
             steps {
-                withCredentials([string(credentialsId: 'artifactory-api-key', variable: 'ART_API_KEY')]) {
+                sh """
+                    docker build \
+                      --build-arg BUILD_VERSION=${BUILD_VERSION} \
+                      -t ${DOCKER_IMAGE}:${BUILD_VERSION} .
+                """
+            }
+        }
+
+        stage('Push Image to DockerHub') {
+            when {
+                expression { return params.RUN_BUILD }
+            }
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
                     sh """
-                        curl -H "X-JFrog-Art-Api: ${ART_API_KEY}" \
-                             -T ramanbuild2/devops-${BUILD_VERSION}.war \
-                             ${ARTIFACTORY_URL}/devops-${BUILD_VERSION}.war
+                        echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
+                        docker push ${DOCKER_IMAGE}:${BUILD_VERSION}
+
+                        # Tag and push latest
+                        docker tag ${DOCKER_IMAGE}:${BUILD_VERSION} ${DOCKER_IMAGE}:latest
+                        docker push ${DOCKER_IMAGE}:latest
                     """
                 }
             }
         }
-*/
-
-
-
     }
 
     post {
         success {
-            echo "Artifact uploaded successfully."
+            echo "Docker image built and pushed successfully."
         }
         failure {
             echo "Pipeline failed."

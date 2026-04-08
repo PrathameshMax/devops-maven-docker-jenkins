@@ -172,3 +172,4 @@ Build the pipeline and watch artefact storage in nexus
 
 -----------------------------------------------------------
 
+-- test poll scm 1 minute build
